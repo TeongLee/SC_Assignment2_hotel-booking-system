@@ -34,3 +34,6 @@ build/
 
 ### Claude Code local state ###
 .claude/
+.agents/
+CLAUDE.md
+skills-lock.json
