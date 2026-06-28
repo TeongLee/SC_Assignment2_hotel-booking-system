@@ -281,7 +281,7 @@ docs/             design blueprint + build guide
 
 | Member | Responsibilities |
 |--------|------------------|
-| **Khoo Teong Lee** | Project setup & configuration (`pom.xml`, `application.properties`), domain model (`Room`, `Booking` entities + enums), repositories, and the `DataSeeder` |
+| **Lim Bo Yuan** | Project setup & configuration (`pom.xml`, `application.properties`), domain model (`Room`, `Booking` entities + enums), repositories, and the `DataSeeder` |
 | **Loh Chee Huan** | Booking functionalities — `BookingService` (double-booking detection + server-side pricing) and `BookingController`: create, retrieve, update, and cancel bookings (functionalities 1–4) |
-| **Lim Bo Yuan** | Room & search functionality — `RoomService`, `RoomController`, the available-rooms search (functionality 5), and the `GlobalExceptionHandler` error handling |
+| **Khoo Teong Lee** | Room & search functionality — `RoomService`, `RoomController`, the available-rooms search (functionality 5), and the `GlobalExceptionHandler` error handling |
 | **Lim Yu An** | Frontend web UI (Cedar & Clay), Postman test collection (happy paths + edge cases), and project documentation (README) |
