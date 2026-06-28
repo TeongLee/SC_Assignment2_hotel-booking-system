@@ -158,6 +158,17 @@ curl -X POST http://localhost:8080/api/bookings \
 
 ---
 
+## Booking Summary
+
+`GET /api/bookings/summary` returns a lightweight booking overview with:
+
+- total bookings
+- confirmed, checked-in, checked-out, and cancelled counts
+- upcoming bookings
+- total revenue
+
+---
+
 ## Business rules
 
 1. **No double-booking (409 Conflict).** Two ranges overlap when
