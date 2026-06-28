@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -65,5 +66,23 @@ public class BookingController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         bookingService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /** Move a booking through its lifecycle: CONFIRMED -> CHECKED_IN. */
+    @PatchMapping("/{id}/check-in")
+    public BookingResponse checkIn(@PathVariable Long id) {
+        return bookingService.checkIn(id);
+    }
+
+    /** CHECKED_IN -> CHECKED_OUT. */
+    @PatchMapping("/{id}/check-out")
+    public BookingResponse checkOut(@PathVariable Long id) {
+        return bookingService.checkOut(id);
+    }
+
+    /** Soft-cancel a booking (-> CANCELLED), freeing the room's dates again. */
+    @PatchMapping("/{id}/cancel")
+    public BookingResponse cancel(@PathVariable Long id) {
+        return bookingService.cancel(id);
     }
 }

@@ -4,6 +4,7 @@ import com.example.hotelbooking.dto.BookingRequest;
 import com.example.hotelbooking.dto.BookingResponse;
 import com.example.hotelbooking.dto.BookingSummaryResponse;
 import com.example.hotelbooking.exception.BookingConflictException;
+import com.example.hotelbooking.exception.InvalidBookingStateException;
 import com.example.hotelbooking.exception.ResourceNotFoundException;
 import com.example.hotelbooking.model.Booking;
 import com.example.hotelbooking.model.BookingStatus;
@@ -114,6 +115,50 @@ public class BookingService {
     public void delete(Long id) {
         Booking booking = findBookingOrThrow(id);
         bookingRepository.delete(booking);
+    }
+
+    // --- status lifecycle (CONFIRMED -> CHECKED_IN -> CHECKED_OUT, or -> CANCELLED) ---
+
+    /** Check a guest in: only a CONFIRMED booking may move to CHECKED_IN. */
+    public BookingResponse checkIn(Long id) {
+        Booking booking = findBookingOrThrow(id);
+        requireStatus(booking, BookingStatus.CONFIRMED, "check in");
+        booking.setStatus(BookingStatus.CHECKED_IN);
+        return toResponse(bookingRepository.save(booking));
+    }
+
+    /** Check a guest out: only a CHECKED_IN booking may move to CHECKED_OUT. */
+    public BookingResponse checkOut(Long id) {
+        Booking booking = findBookingOrThrow(id);
+        requireStatus(booking, BookingStatus.CHECKED_IN, "check out");
+        booking.setStatus(BookingStatus.CHECKED_OUT);
+        return toResponse(bookingRepository.save(booking));
+    }
+
+    /**
+     * Cancel a booking (soft cancel). The record is kept but moves to CANCELLED, which
+     * the overlap check excludes — so the room's dates become bookable again (Rule 5).
+     * A completed (CHECKED_OUT) or already-cancelled booking cannot be cancelled.
+     */
+    public BookingResponse cancel(Long id) {
+        Booking booking = findBookingOrThrow(id);
+        if (booking.getStatus() == BookingStatus.CHECKED_OUT) {
+            throw new InvalidBookingStateException("A checked-out booking cannot be cancelled");
+        }
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new InvalidBookingStateException("Booking " + id + " is already cancelled");
+        }
+        booking.setStatus(BookingStatus.CANCELLED);
+        return toResponse(bookingRepository.save(booking));
+    }
+
+    /** Guard a transition: the booking must currently be in the {@code expected} state. */
+    private void requireStatus(Booking booking, BookingStatus expected, String action) {
+        if (booking.getStatus() != expected) {
+            throw new InvalidBookingStateException(
+                    "Cannot " + action + " a booking in " + booking.getStatus()
+                            + " state; it must be " + expected);
+        }
     }
 
     // --- business rules ---
